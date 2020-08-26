@@ -20,6 +20,9 @@ import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.annotation.TypeHint;
 
 import javax.annotation.PreDestroy;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A {@link org.apache.kafka.common.metrics.MetricsReporter} class for consumer metrics.
@@ -29,6 +32,15 @@ import javax.annotation.PreDestroy;
 public class ConsumerKafkaMetricsReporter extends AbstractKafkaMetricsReporter {
 
     private static final String CONSUMER_PREFIX = AbstractKafkaConfiguration.PREFIX + ".consumer";
+    private static final Set<String> INCLUDED_TAGS;
+
+    static {
+        final Set<String> includedTags = new HashSet<>();
+        includedTags.add(TAG_CLIENT_ID);
+        includedTags.add(TAG_TOPIC);
+        includedTags.add("group-id");
+        INCLUDED_TAGS = Collections.unmodifiableSet(includedTags);
+    }
 
     /**
      * {@inheritDoc}
@@ -36,6 +48,16 @@ public class ConsumerKafkaMetricsReporter extends AbstractKafkaMetricsReporter {
     @Override
     protected String getMetricPrefix() {
         return CONSUMER_PREFIX;
+    }
+
+    /**
+     * The tags to include in the gauge. Defaults to just the client-id.
+     *
+     * @return The tags to include
+     */
+    @Override
+    protected Set<String> getIncludedTags() {
+        return INCLUDED_TAGS;
     }
 
     /**
